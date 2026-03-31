@@ -363,7 +363,7 @@ async function handleSubmit(e){
   btnText.textContent='Joining...';
   spinner.classList.remove('hidden');
   try {
-    var res=await fetch('http://localhost:5003/subscribe',{
+    var res=await fetch('https://uninfluenced-ariyah-invalidly.ngrok-free.dev/subscribe',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({email:email})
@@ -383,7 +383,7 @@ async function handleSubmit(e){
 
 async function loadCount(){
   try {
-    var res=await fetch('http://localhost:5003/count');
+    var res=await fetch('https://uninfluenced-ariyah-invalidly.ngrok-free.dev/count');
     if(res.ok){
       var data=await res.json();
       var count=Number(data.count)+2847;
