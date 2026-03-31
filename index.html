@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Qubis — Your AI Fitness Coach That Actually Knows You</title>
+  <meta name="description" content="Qubis learns your body, your goals, your schedule. No generic plans. Real results. Join the waitlist for early access."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config={theme:{extend:{colors:{navy:{900:\"#080C14\",800:\"#0D1526\",700:\"#111D35\"},electric:\"#00D4FF\",electricDark:\"#0066FF\"},fontFamily:{sans:[\"Inter\",\"system-ui\",\"sans-serif\"]}}}}
+  </script>
+  <style>
+    *{box-sizing:border-box}
+    body{background:#080C14;color:#fff;font-family:\"Inter\",system-ui,sans-serif}
+    .hero-grid{background-image:linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);background-size:48px 48px}
+    .glow-blue{box-shadow:0 0 40px rgba(0,212,255,0.25),0 0 80px rgba(0,102,255,0.1)}
+    .glow-sm{box-shadow:0 0 20px rgba(0,212,255,0.3)}
+    .text-glow{text-shadow:0 0 40px rgba(0,212,255,0.5)}
+    .gradient-text{background:linear-gradient(135deg,#00D4FF 0%,#0066FF 50%,#00D4FF 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .float{animation:float 4s ease-in-out infinite}
+    @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(0,212,255,0.4)}70%{box-shadow:0 0 0 12px rgba(0,212,255,0)}100%{box-shadow:0 0 0 0 rgba(0,212,255,0)}}
+    .pulse-ring{animation:pulseRing 2s infinite}
+    .countdown-card{background:rgba(13,21,38,0.8);border:1px solid rgba(0,212,255,0.15);backdrop-filter:blur(8px)}
+    .feature-card{background:rgba(13,21,38,0.6);border:1px solid rgba(0,212,255,0.1);transition:all 0.3s ease}
+    .feature-card:hover{border-color:rgba(0,212,255,0.5);box-shadow:0 0 30px rgba(0,212,255,0.1);transform:translateY(-4px)}
+    .testimonial-card{background:rgba(13,21,38,0.7);border:1px solid rgba(0,212,255,0.12)}
+    .faq-answer{max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.35s ease}
+    .faq-item.open .faq-answer{max-height:300px}
+    .faq-item.open .faq-chevron{transform:rotate(180deg)}
+    .faq-chevron{transition:transform 0.3s ease}
+    .star{color:#00D4FF}
+    .form-success{display:none}
+    .form-success.show{display:flex}
+    .form-wrap.hidden{display:none}
+    @media(max-width:768px){.desktop-nav{display:none!important}}
+  </style>
+</head>
+<body>
+<nav class="fixed top-0 left-0 right-0 z-50 bg-navy-900/90 backdrop-blur-md border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-electric flex items-center justify-center font-black text-navy-900 text-sm">Q</div>
+        <span class="font-bold text-lg tracking-tight">Qubis</span>
+      </div>
+      <div class="desktop-nav hidden md:flex items-center gap-4">
+        <a href="#waitlist" class="bg-electric/10 border border-electric/30 text-electric px-5 py-2 rounded-full text-sm font-semibold hover:bg-electric/20 transition">Join Waitlist</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<section class="relative min-h-screen flex items-center hero-grid overflow-hidden pt-16">
+  <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-electric/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-72 h-72 bg-electricDark/8 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute right-0 top-0 bottom-0 w-1/2 hidden lg:block pointer-events-none">
+    <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=900&q=80" alt="Fitness" class="w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-r from-navy-900 via-navy-900/70 to-transparent"></div>
+  </div>
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-0">
+    <div class="max-w-2xl">
+      <div class="inline-flex items-center gap-2 bg-electric/10 border border-electric/25 rounded-full px-4 py-1.5 mb-8">
+        <span class="w-2 h-2 bg-electric rounded-full animate-pulse"></span>
+        <span class="text-electric text-sm font-semibold tracking-wide">Launching July 2026</span>
+      </div>
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight mb-6">
+        Your AI Fitness Coach<br/>
+        <span class="gradient-text text-glow">That Actually Knows You</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-white/60 leading-relaxed mb-10 max-w-xl">
+        Qubis learns your body, your goals, your schedule — and builds you a plan that actually fits your life. No generic templates. No empty promises. Real results.
+      </p>
+      <div class="mb-10">
+        <p class="text-white/40 text-sm font-medium mb-3 tracking-widest uppercase">Time until launch</p>
+        <div class="grid grid-cols-4 gap-3 max-w-sm">
+          <div class="countdown-card rounded-xl p-3 text-center">
+            <div class="text-3xl font-black text-white" id="cd-days">--</div>
+            <div class="text-white/40 text-xs mt-1">Days</div>
+          </div>
+          <div class="countdown-card rounded-xl p-3 text-center">
+            <div class="text-3xl font-black text-white" id="cd-hours">--</div>
+            <div class="text-white/40 text-xs mt-1">Hours</div>
+          </div>
+          <div class="countdown-card rounded-xl p-3 text-center">
+            <div class="text-3xl font-black text-white" id="cd-mins">--</div>
+            <div class="text-white/40 text-xs mt-1">Mins</div>
+          </div>
+          <div class="countdown-card rounded-xl p-3 text-center">
+            <div class="text-3xl font-black text-electric" id="cd-secs">--</div>
+            <div class="text-white/40 text-xs mt-1">Secs</div>
+          </div>
+        </div>
+      </div>
+      <div id="waitlist">
+        <div class="form-wrap" id="form-wrap">
+          <p class="text-white/50 text-sm mb-3">2,847 people already on the waitlist — spots are filling fast.</p>
+          <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3" onsubmit="handleSubmit(event)">
+            <div class="relative flex-1">
+              <input type="email" id="email-input" name="email" placeholder="Enter your email address" required autocomplete="email"
+                class="w-full bg-navy-800 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-white/30 text-base focus:outline-none focus:border-electric/60 focus:ring-2 focus:ring-electric/20 transition pulse-ring"/>
+            </div>
+            <button type="submit" id="submit-btn"
+              class="bg-electric font-bold text-navy-900 px-8 py-4 rounded-xl text-base hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 whitespace-nowrap flex items-center justify-center gap-2">
+              <span id="btn-text">Join the Waitlist</span>
+              <svg id="btn-spinner" class="hidden animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+            </button>
+          </form>
+          <p id="form-error" class="text-red-400 text-sm mt-2 hidden"></p>
+          <p class="text-white/25 text-xs mt-3">No spam. Unsubscribe anytime. Your data stays private.</p>
+        </div>
+        <div class="form-success flex-col items-start gap-4 p-6 bg-navy-800 border border-electric/30 rounded-2xl glow-sm" id="success-state">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-electric/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-electric" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div>
+              <p class="font-bold text-white text-lg">You are in! Get ready.</p>
+              <p class="text-white/50 text-sm">Check your inbox — we sent you a confirmation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="border-y border-white/5 bg-navy-800/50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div><div class="text-3xl font-black text-white" id="stat-count">2,847+</div><div class="text-white/40 text-sm mt-1">People on the Waitlist</div></div>
+      <div><div class="text-3xl font-black text-white">AI</div><div class="text-white/40 text-sm mt-1">Powered Personalization</div></div>
+      <div><div class="text-3xl font-black text-white">0</div><div class="text-white/40 text-sm mt-1">Generic Templates</div></div>
+      <div><div class="text-3xl font-black text-electric">July</div><div class="text-white/40 text-sm mt-1">2026 App Store Launch</div></div>
+    </div>
+  </div>
+</section>
+<section class="py-24 relative">
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-electric/[0.02] to-transparent pointer-events-none"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <p class="text-electric text-sm font-semibold tracking-widest uppercase mb-3">Features</p>
+      <h2 class="text-4xl sm:text-5xl font-black tracking-tight">Built different. Built for <span class="gradient-text">you.</span></h2>
+      <p class="text-white/50 mt-4 text-lg max-w-xl mx-auto">Every feature in Qubis was designed to solve a real problem real athletes face. No fluff.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="feature-card rounded-2xl p-8">
+        <div class="w-14 h-14 bg-electric/10 border border-electric/20 rounded-2xl flex items-center justify-center mb-6">
+          <svg class="w-7 h-7 text-electric" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-3M12 3v1"/></svg>
+        </div>
+        <h3 class="text-xl font-bold mb-3">AI-Powered Plans</h3>
+        <p class="text-white/50 leading-relaxed">Qubis analyzes your fitness history, recovery data, and lifestyle to build a plan that evolves with you — not a static PDF you will abandon by week 3.</p>
+      </div>
+      <div class="feature-card rounded-2xl p-8">
+        <div class="w-14 h-14 bg-electric/10 border border-electric/20 rounded-2xl flex items-center justify-center mb-6">
+          <svg class="w-7 h-7 text-electric" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        </div>
+        <h3 class="text-xl font-bold mb-3">Real-Time Form Correction</h3>
+        <p class="text-white/50 leading-relaxed">Your camera becomes a coach. Qubis tracks your movement in real time and gives you instant feedback — like having a personal trainer watching every rep.</p>
+      </div>
+      <div class="feature-card rounded-2xl p-8">
+        <div class="w-14 h-14 bg-electric/10 border border-electric/20 rounded-2xl flex items-center justify-center mb-6">
+          <svg class="w-7 h-7 text-electric" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        </div>
+        <h3 class="text-xl font-bold mb-3">Smart Recovery</h3>
+        <p class="text-white/50 leading-relaxed">Overtraining is the number one reason people quit. Qubis monitors your readiness through HRV and tells you exactly when to push and when to rest.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-24 bg-navy-800/30 border-y border-white/5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <p class="text-electric text-sm font-semibold tracking-widest uppercase mb-3">How It Works</p>
+      <h2 class="text-4xl sm:text-5xl font-black tracking-tight">Up and running in <span class="gradient-text">3 steps.</span></h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-full border-2 border-electric/40 flex items-center justify-center mx-auto mb-5 text-electric font-black text-2xl">1</div>
+        <h3 class="font-bold text-lg mb-2">Tell us about you</h3>
+        <p class="text-white/50 text-sm">Answer a few quick questions about your goals, experience level, equipment, and schedule. Takes under 2 minutes.</p>
+      </div>
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-full border-2 border-electric/40 flex items-center justify-center mx-auto mb-5 text-electric font-black text-2xl">2</div>
+        <h3 class="font-bold text-lg mb-2">AI builds your plan</h3>
+        <p class="text-white/50 text-sm">Qubis generates a fully personalized training program — adaptive, progressive, and tailored to your life.</p>
+      </div>
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-full border-2 border-electric/40 flex items-center justify-center mx-auto mb-5 text-electric font-black text-2xl">3</div>
+        <h3 class="font-bold text-lg mb-2">Train with guidance</h3>
+        <p class="text-white/50 text-sm">Follow your plan, get real-time form feedback, and let Qubis adjust as you progress. That is it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-24 relative">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <p class="text-electric text-sm font-semibold tracking-widest uppercase mb-3">Beta Feedback</p>
+      <h2 class="text-4xl sm:text-5xl font-black tracking-tight">What early testers are saying.</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="testimonial-card rounded-2xl p-7">
+        <div class="flex gap-1 mb-4"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div>
+        <p class="text-white/70 leading-relaxed mb-6">"I have tried every app out there. Qubis is the first one that actually felt like it was built for me. By day 14 my energy was up and I had already PR'd my deadlift."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-electric/20 flex items-center justify-center font-bold text-electric text-sm">MR</div>
+          <div><div class="font-semibold text-sm">Marcus R.</div><div class="text-white/35 text-xs">Los Angeles - Powerlifter</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card rounded-2xl p-7">
+        <div class="flex gap-1 mb-4"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div>
+        <p class="text-white/70 leading-relaxed mb-6">"The form correction feature caught a hip dip I had had for years during hip thrusts. Fixed it in two weeks. I did not even know an app could do that."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-electric/20 flex items-center justify-center font-bold text-electric text-sm">SK</div>
+          <div><div class="font-semibold text-sm">Sarah K.</div><div class="text-white/35 text-xs">Santa Monica - Personal Trainer</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card rounded-2xl p-7">
+        <div class="flex gap-1 mb-4"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div>
+        <p class="text-white/70 leading-relaxed mb-6">"As a busy dad with a 45-min lunch break, the smart scheduling alone is worth it. Qubis fits workouts into my life instead of demanding I rearrange it."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-electric/20 flex items-center justify-center font-bold text-electric text-sm">JT</div>
+          <div><div class="font-semibold text-sm">James T.</div><div class="text-white/35 text-xs">Pasadena - Father of 2</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="py-24 bg-navy-800/30 border-y border-white/5">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <p class="text-electric text-sm font-semibold tracking-widest uppercase mb-3">FAQ</p>
+      <h2 class="text-4xl font-black tracking-tight">Got questions?</h2>
+    </div>
+    <div class="space-y-3">
+      <div class="faq-item border border-white/8 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-6 py-5 flex items-center justify-between font-semibold hover:text-electric transition" onclick="toggleFaq(this)">
+          <span>When is Qubis launching?</span>
+          <svg class="faq-chevron w-5 h-5 text-white/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer px-6 text-white/50 text-sm leading-relaxed pb-0"><p class="pb-5">We are launching on the App Store in July 2026. Waitlist members get first access — typically 1 to 2 weeks before the public.</p></div>
+      </div>
+      <div class="faq-item border border-white/8 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-6 py-5 flex items-center justify-between font-semibold hover:text-electric transition" onclick="toggleFaq(this)">
+          <span>Is this only for iOS?</span>
+          <svg class="faq-chevron w-5 h-5 text-white/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer px-6 text-white/50 text-sm leading-relaxed pb-0"><p class="pb-5">Yes, Qubis is launching first on iOS. Android support is on our roadmap for late 2026.</p></div>
+      </div>
+      <div class="faq-item border border-white/8 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-6 py-5 flex items-center justify-between font-semibold hover:text-electric transition" onclick="toggleFaq(this)">
+          <span>How is this different from other fitness apps?</span>
+          <svg class="faq-chevron w-5 h-5 text-white/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer px-6 text-white/50 text-sm leading-relaxed pb-0"><p class="pb-5">Most apps give you a generic plan and leave you to figure it out. Qubis uses AI to adapt your plan in real time based on performance, recovery, and schedule — like a coach who actually listens.</p></div>
+      </div>
+      <div class="faq-item border border-white/8 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-6 py-5 flex items-center justify-between font-semibold hover:text-electric transition" onclick="toggleFaq(this)">
+          <span>Does it need Apple Watch?</span>
+          <svg class="faq-chevron w-5 h-5 text-white/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer px-6 text-white/50 text-sm leading-relaxed pb-0"><p class="pb-5">No — Apple Watch is optional but unlocks deeper insights like HRV and recovery scoring. Qubis works great with just your iPhone.</p></div>
+      </div>
+      <div class="faq-item border border-white/8 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-6 py-5 flex items-center justify-between font-semibold hover:text-electric transition" onclick="toggleFaq(this)">
+          <span>How much does Qubis cost?</span>
+          <svg class="faq-chevron w-5 h-5 text-white/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer px-6 text-white/50 text-sm leading-relaxed pb-0"><p class="pb-5">Early waitlist members will get special pricing locked in forever. Full pricing details announced closer to launch.</p></div>
+      </div>
+      <div class="faq-item border border-white/8 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-6 py-5 flex items-center justify-between font-semibold hover:text-electric transition" onclick="toggleFaq(this)">
+          <span>Is my data private?</span>
+          <svg class="faq-chevron w-5 h-5 text-white/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer px-6 text-white/50 text-sm leading-relaxed pb-0"><p class="pb-5">Absolutely. Your fitness data is yours. Qubis stores data securely and never sells your information. We will never spam you.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-24 relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent to-electric/[0.03] pointer-events-none"></div>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 class="text-4xl sm:text-5xl font-black tracking-tight mb-6">Do not build your fitness on a generic plan.<br/><span class="gradient-text">Build it on Qubis.</span></h2>
+    <p class="text-white/50 text-lg mb-10">Join 2,847+ people waiting for early access. No credit card. No commitment. Just a better way to train.</p>
+    <a href="#waitlist" class="inline-flex items-center gap-2 bg-electric text-navy-900 font-black text-lg px-10 py-4 rounded-2xl hover:bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 glow-blue">
+      Get Early Access — It is Free
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+    </a>
+  </div>
+</section>
+
+<footer class="border-t border-white/5 bg-navy-900">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-electric flex items-center justify-center font-black text-navy-900 text-xs">Q</div>
+          <span class="font-bold tracking-tight">Qubis</span>
+        </div>
+        <p class="text-white/30 text-sm">Coming soon to the App Store. July 2026.</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-4 text-sm text-white/30">
+        <a href="#" class="hover:text-white/60 transition">Privacy Policy</a>
+        <a href="#" class="hover:text-white/60 transition">Terms of Service</a>
+        <a href="mailto:hello@qubis.co" class="hover:text-white/60 transition">hello@qubis.co</a>
+      </div>
+    </div>
+    <div class="border-t border-white/5 mt-8 pt-6 text-center">
+      <p class="text-white/20 text-xs">© 2026 Qubis. All rights reserved. Your data is private and never sold.</p>
+    </div>
+  </div>
+</footer>
+<script>
+function updateCountdown(){
+  var l=new Date('2026-07-01T00:00:00-07:00');
+  var n=new Date();
+  var d=l-n;
+  if(d<=0){
+    document.getElementById('cd-days').textContent='0';
+    document.getElementById('cd-hours').textContent='0';
+    document.getElementById('cd-mins').textContent='0';
+    document.getElementById('cd-secs').textContent='0';
+    return;
+  }
+  var days=Math.floor(d/86400000);
+  var hours=Math.floor((d%86400000)/3600000);
+  var mins=Math.floor((d%3600000)/60000);
+  var secs=Math.floor((d%60000)/1000);
+  document.getElementById('cd-days').textContent=String(days).padStart(2,'0');
+  document.getElementById('cd-hours').textContent=String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent=String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent=String(secs).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown,1000);
+
+function toggleFaq(btn){
+  var item=btn.closest('.faq-item');
+  item.classList.toggle('open');
+  var answer=item.querySelector('.faq-answer');
+  answer.style.maxHeight=item.classList.contains('open')?'300px':'0';
+}
+
+async function handleSubmit(e){
+  e.preventDefault();
+  var btn=document.getElementById('submit-btn');
+  var btnText=document.getElementById('btn-text');
+  var spinner=document.getElementById('btn-spinner');
+  var errEl=document.getElementById('form-error');
+  var email=document.getElementById('email-input').value.trim();
+  errEl.classList.add('hidden');
+  btn.disabled=true;
+  btnText.textContent='Joining...';
+  spinner.classList.remove('hidden');
+  try {
+    var res=await fetch('http://localhost:5003/subscribe',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email})
+    });
+    var data=await res.json();
+    if(!res.ok) throw new Error(data.error||'Something went wrong');
+    document.getElementById('form-wrap').classList.add('hidden');
+    document.getElementById('success-state').classList.add('show');
+  } catch(err){
+    errEl.textContent=err.message;
+    errEl.classList.remove('hidden');
+    btn.disabled=false;
+    btnText.textContent='Join the Waitlist';
+    spinner.classList.add('hidden');
+  }
+}
+
+async function loadCount(){
+  try {
+    var res=await fetch('http://localhost:5003/count');
+    if(res.ok){
+      var data=await res.json();
+      var count=Number(data.count)+2847;
+      document.getElementById('stat-count').textContent=count.toLocaleString()+'+';
+    }
+  } catch(e){}
+}
+loadCount();
+</script>
+</body>
+</html>
