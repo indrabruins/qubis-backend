@@ -10,6 +10,8 @@ import csv
 import uuid
 import sqlite3
 import smtplib
+import secrets
+import string
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -20,7 +22,7 @@ from dotenv import load_dotenv
 # ── Config ────────────────────────────────────────────────────────────────────
 load_dotenv()  # Load .env if present
 DATABASE = os.path.join(os.path.dirname(__file__), "waitlist.db")
-PORT = 5003
+PORT = int(os.environ.get("PORT", 5003))
 API_KEY = os.environ.get("WAITLIST_API_KEY", "qubis-secret-key-change-me")
 APP_URL = os.environ.get("APP_URL", "http://localhost:5003")
 
@@ -41,13 +43,15 @@ def init_db():
     conn = get_db()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS waitlist (
-            id         INTEGER PRIMARY KEY AUTOINCREMENT,
-            email      TEXT    UNIQUE NOT NULL,
-            source     TEXT    DEFAULT '',
-            status     TEXT    DEFAULT 'pending',
-            token      TEXT,
-            confirmed_at TEXT,
-            created_at TEXT    DEFAULT (datetime('now'))
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            email         TEXT    UNIQUE NOT NULL,
+            source        TEXT    DEFAULT '',
+            referral_code TEXT    UNIQUE,
+            referred_by   TEXT    DEFAULT '',
+            status        TEXT    DEFAULT 'pending',
+            token         TEXT,
+            confirmed_at  TEXT,
+            created_at    TEXT    DEFAULT (datetime('now'))
         )
     """)
     conn.execute("""
@@ -59,19 +63,61 @@ def init_db():
             clicked   INTEGER DEFAULT 0
         )
     """)
+    # Migration: add referral columns if they don't exist
+    try:
+        conn.execute("ALTER TABLE waitlist ADD COLUMN referral_code TEXT UNIQUE")
+    except Exception:
+        pass
+    try:
+        conn.execute("ALTER TABLE waitlist ADD COLUMN referred_by TEXT DEFAULT ''")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
-# ── Email Validation ───────────────────────────────────────────────────────────
+# ── Referral Code Generation ────────────────────────────────────────────────────
+REFERRAL_CHARS = string.ascii_uppercase + string.digits
+
+def generate_referral_code(length=6):
+    """Generate a unique 6-char alphanumeric referral code."""
+    while True:
+        code = ''.join(secrets.choice(REFERRAL_CHARS) for _ in range(length))
+        conn = get_db()
+        existing = conn.execute(
+            "SELECT id FROM waitlist WHERE referral_code = ?", (code,)
+        ).fetchone()
+        conn.close()
+        if not existing:
+            return code
+
+# ── Email Validation ────────────────────────────────────────────────────────────
 EMAIL_RE = re.compile(r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$")
 
 def is_valid_email(email: str) -> bool:
     return bool(EMAIL_RE.match(email.strip()))
 
 # ── Resend Integration ─────────────────────────────────────────────────────────
-def send_confirmation_email(email: str, token: str) -> bool:
+def send_confirmation_email(email: str, token: str, referral_code: str = None) -> bool:
     """Send confirmation email via Resend API. Returns True on success."""
     confirm_url = f"{APP_URL}/confirm?token={token}&email={email}"
+    referral_url = f"{APP_URL}/referrals/{referral_code}" if referral_code else None
+
+    referral_section = ""
+    if referral_url:
+        referral_section = f"""
+        <div style="background: rgba(0,212,255,0.08); border: 1px dashed rgba(0,212,255,0.3); border-radius: 12px; padding: 20px; margin: 24px 0; text-align: center;">
+          <p style="color: rgba(255,255,255,0.7); margin: 0 0 12px; font-size: 14px;">
+            <strong style="color: #00D4FF;">Skip the line</strong> — share your referral link and move up the waitlist.
+          </p>
+          <p style="color: rgba(255,255,255,0.5); margin: 0 0 16px; font-size: 13px;">
+            Each friend who joins moves you higher. Unlimited upgrades.
+          </p>
+          <a href="{referral_url}"
+             style="display: inline-block; background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.4); color: #00D4FF; font-weight: 700; font-size: 13px; padding: 10px 24px; border-radius: 8px; text-decoration: none;">
+            {referral_url}
+          </a>
+        </div>
+        """
 
     html_body = f"""
     <div style="font-family: Inter, system-ui, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; background: #080C14; color: #fff;">
@@ -84,6 +130,7 @@ def send_confirmation_email(email: str, token: str) -> bool:
         <p style="color: rgba(255,255,255,0.7); margin: 0 0 24px; line-height: 1.6;">
           Welcome to the Qubis waitlist. You are joining thousands of people who are tired of generic fitness plans. We are building something different — and we will let you know the moment it launches.
         </p>
+        {referral_section}
         <a href="{confirm_url}"
            style="display: inline-block; background: #00D4FF; color: #080C14; font-weight: 800; font-size: 16px; padding: 16px 40px; border-radius: 12px; text-decoration: none;">
           Confirm My Spot
@@ -96,7 +143,6 @@ def send_confirmation_email(email: str, token: str) -> bool:
     """
 
     if RESEND_API_KEY:
-        # Use Resend API
         import urllib.request
         import json
         payload = json.dumps({
@@ -120,9 +166,11 @@ def send_confirmation_email(email: str, token: str) -> bool:
         except Exception:
             return False
     else:
-        # Log to console for local dev
         print(f"\n[DEV EMAIL] To: {email}")
-        print(f"[DEV EMAIL] Confirm link: {confirm_url}\n")
+        print(f"[DEV EMAIL] Confirm link: {confirm_url}")
+        if referral_url:
+            print(f"[DEV EMAIL] Referral link: {referral_url}")
+        print()
         return True
 
 
@@ -139,28 +187,30 @@ def subscribe():
     data = request.get_json(silent=True) or {}
     email = (data.get("email") or "").strip().lower()
     source = (data.get("source") or "").strip()
+    referred_by = (data.get("referred_by") or "").strip().upper()
 
     if not email or not is_valid_email(email):
         return jsonify({"error": "Please provide a valid email address."}), 400
 
     conn = get_db()
     existing = conn.execute(
-        "SELECT id, status FROM waitlist WHERE email = ?", (email,)
+        "SELECT id, status, referral_code FROM waitlist WHERE email = ?", (email,)
     ).fetchone()
 
     if existing:
         conn.close()
-        # Still return success so we don't leak which emails are registered
         return jsonify({
             "message": "You are already on the list!",
-            "count": _get_count()
+            "count": _get_count(),
+            "referral_code": existing["referral_code"] or None
         }), 200
 
     token = str(uuid.uuid4())
+    referral_code = generate_referral_code()
 
     conn.execute(
-        "INSERT INTO waitlist (email, source, status, token) VALUES (?, ?, 'pending', ?)",
-        (email, source, token)
+        "INSERT INTO waitlist (email, source, status, token, referral_code, referred_by) VALUES (?, ?, 'pending', ?, ?, ?)",
+        (email, source, token, referral_code, referred_by)
     )
     conn.execute(
         "INSERT INTO confirmation_log (email, token) VALUES (?, ?)",
@@ -169,15 +219,15 @@ def subscribe():
     conn.commit()
     conn.close()
 
-    # Send confirmation email (non-blocking — log error but don't fail the request)
     try:
-        send_confirmation_email(email, token)
+        send_confirmation_email(email, token, referral_code)
     except Exception as e:
         print(f"[WARNING] Could not send confirmation email: {e}")
 
     return jsonify({
         "message": "You are on the list! Check your inbox to confirm.",
-        "count": _get_count(get_db())
+        "count": _get_count(),
+        "referral_code": referral_code
     }), 201
 
 
@@ -253,9 +303,44 @@ def count():
     conn = get_db()
     db_count = conn.execute("SELECT COUNT(*) as c FROM waitlist").fetchone()["c"]
     conn.close()
-    # Add offset so displayed count = real + offset (2847)
     offset = 2847
     return jsonify({"count": db_count + offset})
+
+
+@app.route("/referrals/<code>", methods=["GET"])
+def referrals(code):
+    """Return referrer's position and referral count for a given referral code."""
+    code = code.strip().upper()
+    conn = get_db()
+    referrer = conn.execute(
+        "SELECT id, email, referral_code FROM waitlist WHERE referral_code = ?",
+        (code,)
+    ).fetchone()
+
+    if not referrer:
+        conn.close()
+        return jsonify({"error": "Invalid referral code."}), 404
+
+    # Position: count of confirmed signups before this referrer (by id)
+    position = conn.execute(
+        "SELECT COUNT(*) as c FROM waitlist WHERE id < ? AND status = 'confirmed'",
+        (referrer["id"],)
+    ).fetchone()["c"] + 1
+
+    # Count of confirmed referrals (people this referrer brought in)
+    referral_count = conn.execute(
+        "SELECT COUNT(*) as c FROM waitlist WHERE referred_by = ? AND status = 'confirmed'",
+        (code,)
+    ).fetchone()["c"]
+
+    conn.close()
+
+    return jsonify({
+        "referral_code": code,
+        "referral_count": referral_count,
+        "waitlist_position": position,
+        "message": f"You have {referral_count} confirmed referrals. You are #{position} on the confirmed waitlist."
+    })
 
 
 @app.route("/export", methods=["GET"])
@@ -267,14 +352,14 @@ def export():
 
     conn = get_db()
     rows = conn.execute(
-        "SELECT email, status, source, created_at, confirmed_at FROM waitlist ORDER BY created_at ASC"
+        "SELECT email, status, source, referral_code, referred_by, created_at, confirmed_at FROM waitlist ORDER BY created_at ASC"
     ).fetchall()
     conn.close()
 
     def generate():
         import io
         output = io.StringIO()
-        writer = csv.DictWriter(output, fieldnames=["email", "status", "source", "created_at", "confirmed_at"])
+        writer = csv.DictWriter(output, fieldnames=["email", "status", "source", "referral_code", "referred_by", "created_at", "confirmed_at"])
         writer.writeheader()
         for row in rows:
             writer.writerow(dict(row))
@@ -292,7 +377,7 @@ def export():
 
 @app.route("/stats", methods=["GET"])
 def stats():
-    """Simple dashboard stats. Requires API key."""
+    """Stats with referral metrics. Requires API key."""
     auth = request.headers.get("Authorization", "")
     if not auth.startswith("Bearer ") or auth[7:] != API_KEY:
         return jsonify({"error": "Unauthorized"}), 401
@@ -301,6 +386,22 @@ def stats():
     total = conn.execute("SELECT COUNT(*) as c FROM waitlist").fetchone()["c"]
     confirmed = conn.execute("SELECT COUNT(*) as c FROM waitlist WHERE status='confirmed'").fetchone()["c"]
     pending = conn.execute("SELECT COUNT(*) as c FROM waitlist WHERE status='pending'").fetchone()["c"]
+
+    total_referrals = conn.execute(
+        "SELECT COUNT(*) as c FROM waitlist WHERE referred_by != ''"
+    ).fetchone()["c"]
+    confirmed_referrals = conn.execute(
+        "SELECT COUNT(*) as c FROM waitlist WHERE referred_by != '' AND status='confirmed'"
+    ).fetchone()["c"]
+    top_referrers = conn.execute("""
+        SELECT referred_by, COUNT(*) as cnt
+        FROM waitlist
+        WHERE referred_by != ''
+        GROUP BY referred_by
+        ORDER BY cnt DESC
+        LIMIT 10
+    """).fetchall()
+
     recent = conn.execute(
         "SELECT email, created_at FROM waitlist ORDER BY created_at DESC LIMIT 10"
     ).fetchall()
@@ -311,7 +412,75 @@ def stats():
         "confirmed": confirmed,
         "pending": pending,
         "confirmation_rate": round(confirmed / total * 100, 1) if total else 0,
+        "total_referrals": total_referrals,
+        "confirmed_referrals": confirmed_referrals,
+        "top_referrers": [dict(r) for r in top_referrers],
         "recent_signups": [dict(r) for r in recent]
+    })
+
+
+@app.route("/admin/stats", methods=["GET"])
+def admin_stats():
+    """Full analytics dashboard. Requires API key."""
+    auth = request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer ") or auth[7:] != API_KEY:
+        return jsonify({"error": "Unauthorized. Provide header: Authorization: Bearer <WAITLIST_API_KEY>"}), 401
+
+    conn = get_db()
+
+    total = conn.execute("SELECT COUNT(*) as c FROM waitlist").fetchone()["c"]
+    confirmed = conn.execute("SELECT COUNT(*) as c FROM waitlist WHERE status='confirmed'").fetchone()["c"]
+    pending = conn.execute("SELECT COUNT(*) as c FROM waitlist WHERE status='pending'").fetchone()["c"]
+
+    emails_sent = conn.execute("SELECT COUNT(*) as c FROM confirmation_log").fetchone()["c"]
+    emails_clicked = conn.execute("SELECT SUM(clicked) as c FROM confirmation_log").fetchone()["c"] or 0
+    open_rate = round(emails_clicked / emails_sent * 100, 1) if emails_sent else 0
+
+    by_day_rows = conn.execute("""
+        SELECT DATE(created_at) as day, COUNT(*) as count
+        FROM waitlist
+        WHERE created_at >= datetime('now', '-14 days')
+        GROUP BY DATE(created_at)
+        ORDER BY day ASC
+    """).fetchall()
+
+    top_referrers = conn.execute("""
+        SELECT w.referral_code, w.email, COUNT(*) as confirmed_referrals
+        FROM waitlist r
+        JOIN waitlist w ON r.referred_by = w.referral_code
+        WHERE r.referred_by != '' AND r.status = 'confirmed'
+        GROUP BY w.referral_code
+        ORDER BY confirmed_referrals DESC
+        LIMIT 10
+    """).fetchall()
+
+    sources = conn.execute("""
+        SELECT source, COUNT(*) as count
+        FROM waitlist
+        GROUP BY source
+        ORDER BY count DESC
+    """).fetchall()
+
+    conn.close()
+
+    return jsonify({
+        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "waitlist": {
+            "total": total,
+            "confirmed": confirmed,
+            "pending": pending,
+            "confirmation_rate": round(confirmed / total * 100, 1) if total else 0
+        },
+        "email": {
+            "sent": emails_sent,
+            "opened": int(emails_clicked),
+            "open_rate": open_rate
+        },
+        "referrals": {
+            "top_10": [dict(r) for r in top_referrers]
+        },
+        "signups_by_day": [dict(r) for r in by_day_rows],
+        "sources": [dict(r) for r in sources]
     })
 
 
